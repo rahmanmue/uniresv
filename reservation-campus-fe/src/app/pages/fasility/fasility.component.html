@@ -1,0 +1,28 @@
+<app-template-admin>
+    <div class= "container" *ngIf="facilitiesData">
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Information</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>         
+                <th scope="col">Button</th>         
+              </tr>
+            </thead>
+            <tbody *ngFor="let facility of facilitiesData.data">
+              <tr>
+                <th scope="row">{{facility.name}}</th>
+                <th scope="row">{{facility.information}}</th>
+                <th scope="row">{{facility.quantity}}</th>
+                <th scope="row">{{facility.price}}</th>
+                <th scope="row">
+                    <button class="btn btn-primary">Edit</button>
+                    <button class="btn btn-danger">Delete</button>
+                </th>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+    <p>fasilitas works!</p>
+</app-template-admin>
