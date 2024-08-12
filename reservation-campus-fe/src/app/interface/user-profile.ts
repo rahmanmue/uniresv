@@ -1,4 +1,5 @@
 export interface UserProfileRequestBody {
+    [x: string]: any;
     id?: string;              
     nim: number;             
     fullName: string;        

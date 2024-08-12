@@ -34,3 +34,10 @@ function checkAuthentication(){
     return false;
   }
 }
+
+function getRole(): string | undefined{
+  const token = localStorage.getItem('token') as string;
+  const decode = jwtDecode(token) as { role: string };
+  const role = decode.role;
+  return role
+}

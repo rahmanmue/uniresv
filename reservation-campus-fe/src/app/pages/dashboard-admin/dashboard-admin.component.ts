@@ -1,7 +1,23 @@
 import { Component } from '@angular/core';
-import { jwtDecode } from 'jwt-decode';
 import { TemplateAdminComponent } from '../../shared/template-admin/template-admin.component';
 import { RouterOutlet } from '@angular/router';
+import { AnalyticsService } from '../../services/analytics.service';
+import { Chart } from 'chart.js/auto';
+
+interface FACILITIES {
+  FACILITIES_TOOL : string,
+  FACILITIES_VEHICLE : string,
+  FACILITIES_PLACE : string
+}
+
+interface TRANSACTION {
+  STATUS_COMPLETED : string,
+  STATUS_APPROVED : string,
+  STATUS_PROCESSED : string,
+  STATUS_REJECTED : string,
+  STATUS_CANCELED : string,
+  STATUS_PENALTY : string
+}
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -11,16 +27,61 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './dashboard-admin.component.scss'
 })
 export class DashboardAdminComponent {
- 
+  facilities! : FACILITIES; 
+  transaction! : TRANSACTION;
+  chart:any;
+  
 
-  constructor(){
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJXRUIgUkVTRVJWQVRJT04gQ0FNUFVTIiwic3ViIjoiNzk1NzdlZGUtZDI5MC00YWRlLWExZDEtNmFmNzAxMWRlNGU4IiwiZXhwIjoxNzE1Njk5MzkyLCJpYXQiOjE3MTU2OTU3OTIsInJvbGUiOiJST0xFX0FETUlOIn0.kdyJhrm3mbrvK7QOtbLBWNNm-V4jWppuHaZYY4Px3PU"
-    const jwt = jwtDecode(token);
-    
-    console.log(new Date(1715699392 * 1000))
-    console.log(jwt);
+  constructor(
+    private analyticsService: AnalyticsService,
+  ){}
 
+  ngOnInit(): void {
+    this.analyticsService.getAnalyticsFacilities().subscribe(data => {
+      this.facilities = data as FACILITIES;
+      this.createChartFacilities();
+    })
+
+    this.analyticsService.getAnalyticsTransaction().subscribe(data => {
+      this.transaction = data as TRANSACTION;
+      this.createChartTransaction();
+    })
+  }
+
+  createChartFacilities(){
+    const ctx = document.getElementById('facilitiesStatusChart') as HTMLCanvasElement;
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ["KENDARAAN", "ALAT", "TEMPAT"],
+        datasets: [{
+          label: "Independent Status",
+          data: [this.facilities.FACILITIES_VEHICLE, this.facilities.FACILITIES_TOOL, this.facilities.FACILITIES_PLACE],
+          backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)', 'rgb(255, 206, 86)'] 
+        }]
+      }
+    });
   }
   
+  
+  createChartTransaction(){
+    const ctx = document.getElementById('transactionStatusChart') as HTMLCanvasElement;
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ["DITERIMA", "DITOLAK", "DIPROSES", "DITOLAK", "DIBATALKAN", "DIKEMBALIKAN"],
+        datasets: [{
+          label: "Status Peminjaman",
+          data: [this.transaction.STATUS_APPROVED, this.transaction.STATUS_REJECTED, this.transaction.STATUS_PROCESSED, this.transaction.STATUS_CANCELED, this.transaction.STATUS_PENALTY, this.transaction.STATUS_COMPLETED],
+          backgroundColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)', 'rgb(255, 206, 86)', 'rgb(75, 192, 192)', 'rgb(153, 102, 255)', 'rgb(255, 159, 64)'] 
+        }],
+      }});
+  }
+
+
+  
  
+
+
+
 }
